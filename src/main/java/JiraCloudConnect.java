@@ -11,8 +11,8 @@ public class JiraCloudConnect {
         try {
 
         	HttpResponse<JsonNode> response = null;
-			response = Unirest.get("https://tekdemo.atlassian.net/rest/api/2/issue/RA-3")
-					  .basicAuth("manjunathr@crgroup.co.in", "6fxnzTw9DdxRPf8CpxvSB99D")
+			response = Unirest.get("https://sanjma.atlassian.net/rest/api/2/issue/ISD-1")
+					  .basicAuth("sanjmahajan7777@gmail.com", "YBYtbILAE1LK3lfheGYM62EA")
 					  .header("Accept", "application/json")
 					  .header("Content-Type", "application/json")
 					  .asJson();
@@ -25,8 +25,6 @@ public class JiraCloudConnect {
         		 JSONObject fields =  jsonObject.getJSONObject("fields");
         		 System.out.println("Summary     :"+fields.get("summary"));
         		 System.out.println("Description :"+fields.get("description"));
-        		 JSONObject assignee = (JSONObject) fields.get("assignee");
-        		 System.out.println("Assignee    :"+assignee.get("name"));
         		 JSONObject issuetype = fields.getJSONObject("issuetype");
         		 System.out.println("Issuetype   :"+issuetype.get("name"));
         		 JSONObject project = fields.getJSONObject("project");

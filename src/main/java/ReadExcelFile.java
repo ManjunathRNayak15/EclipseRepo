@@ -1,10 +1,15 @@
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.formula.functions.Column;
 import org.apache.poi.ss.usermodel.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.*;
 
 public class ReadExcelFile {
-    public static final String SAMPLE_XLSX_FILE_PATH = "/home/manjunath/Desktop/Codes/Cloud/TestExcel1.xlsx";
+    public static final String SAMPLE_XLSX_FILE_PATH = "/home/manjunath/Desktop/Codes/Cloud/Comm sheet.xlsx";
 
     public static void main(String[] args) throws IOException, InvalidFormatException {
         // Creating a Workbook from an Excel file (.xls or .xlsx)
@@ -68,15 +73,62 @@ public class ReadExcelFile {
         }
 			*/
         // 2. Or you can use a for-each loop to iterate over the rows and columns
-        System.out.println("\n\nIterating over Rows and Columns using for-each loop\n");
-        for (Row row: sheet) {
-            for(Cell cell: row) {
+        
+        Map<String, Integer> map = new HashMap<String,Integer>(); //Create map
+        Row row = sheet.getRow(0); //Get first row
+        //following is boilerplate from the java doc
+        short minColIx = row.getFirstCellNum(); //get the first column index for a row
+        short maxColIx = row.getLastCellNum(); //get the last column index for a row
+        for(short colIx=minColIx; colIx<maxColIx; colIx++) { //loop from first to last index
+           Cell cell = row.getCell(colIx); //get the cell
+           map.put(cell.getStringCellValue(),cell.getColumnIndex()); //add the cell contents (name of column) and cell index to the map
+         }
+        System.out.println(map.get("Tek Order #"));
+        
+        int ordercol = map.get("Tek Order #");
+        int Netprice = map.get("Net price");
+        int Commn = map.get("Commn %");
+        int Commnpayable = map.get("Commn payable");
+
+        	
+               ArrayList<ArrayList<String>> list = new ArrayList<ArrayList<String>>();
+                for (Row row1: sheet) {
+                	ArrayList<String> col = new ArrayList<String>();
+                    for(Cell cell: row1) {
+                        String cellValue = dataFormatter.formatCellValue(cell);
+                        col.add(cellValue);
+                    }
+                    list.add(col);
+                }
+                workbook.close();
+                System.out.println(list);
+                ArrayList<ArrayList> det = new ArrayList<ArrayList>();
+        	int len = list.size();
+        	for(int i=1;i<list.size();i++) {
+                ArrayList info = new ArrayList();
+        		ArrayList<String> a= list.get(i);
+        				String ord = a.get(ordercol);
+        				String netprice = a.get(Netprice);
+        				String comm = a.get(Commn);
+        				double net = convert(netprice);
+        				double com = convert(comm);
+        				double commPayable =  (net * com /100);
+        				info.add(ord);
+        				info.add(commPayable);
+        				System.out.println(ord);
+        				System.out.println(commPayable);
+        				System.out.println(info);
+        				det.add(info);
+        			}
+        System.out.println(det);
+      /*  System.out.println("\n\nIterating over Rows and Columns using for-each loop\n");
+        for (Row row1: sheet) {
+            for(Cell cell: row1) {
                 String cellValue = dataFormatter.formatCellValue(cell);
                 System.out.print(cellValue + "\t");
             }
             System.out.println();
-        }
-
+        }*/
         // 3. Or you can use Java 8 forEach loop with lambda
      /*   System.out.println("\n\nIterating over Rows and Columns using Java 8 forEach with lambda\n");
         sheet.forEach(row -> {
@@ -90,4 +142,20 @@ public class ReadExcelFile {
         // Closing the workbook
         workbook.close();
     }
+
+	private static double convert(String string) {
+		int len = string.length();
+		double value;
+		String val = "";
+		for(int i=0;i<len;i++) {
+			if(string.charAt(i)>=48 && string.charAt(i)<=57 || string.charAt(i)==46) {
+				val = val + string.charAt(i);
+			}
+		}
+		value=Double.valueOf(val);
+		return value;
+		// TODO Auto-generated method stub
+		
+	}
+   
 }
